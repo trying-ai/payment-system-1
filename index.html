@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment System</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --hover-color: #2563eb;
+            --background-color: #f1f5f9;
+            --card-background: #ffffff;
+            --text-color: #1e293b;
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                        url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-color);
+        }
+
+        /* סגנון מיוחד לטקסט העברי בכותרת */
+        h1 span {
+            font-family: 'David CLM', 'Frank Ruhl Libre', serif;
+            margin-right: 0.5rem;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            flex: 1;
+            min-width: 200px;
+            height: 48px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0 1rem;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        button {
+            flex: 2;
+            min-width: 452px;
+            height: 48px;
+            padding: 0 2rem;
+            font-size: 1rem;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(66, 133, 244, 0.2);
+        }
+
+        button:hover {
+            background-color: #1a73e8;
+            box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(66, 133, 244, 0.2);
+        }
+
+        table {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        th {
+            background-color: #f8fafc;
+            padding: 1.25rem 1rem;
+            font-weight: 600;
+            text-align: right;
+            color: #64748b;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .paid, .unpaid {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+
+        .paid {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .unpaid {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 1rem;
+            }
+            
+            select, input, button {
+                min-width: 100%;
+            }
+        }
+
+        .credit {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .credit a {
+            color: #4285f4;  /* צבע כחול של גוגל */
+            text-decoration: none;
+        }
+
+        .credit a:hover {
+            text-decoration: underline;
+        }
+
+        .reset-btn {
+            background-color: #f3f4f6;  /* רקע אפור בהיר */
+            color: #6b7280;  /* צבע טקסט אפור */
+            border: 1px solid #e5e7eb;  /* מסגרת עדינה */
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;  /* פדינג קטן יותר */
+            cursor: pointer;
+            font-size: 0.85rem;  /* פונט קטן יותר */
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);  /* צל עדין */
+        }
+
+        .reset-btn:hover {
+            background-color: #fee2e2;  /* רקע אדמדם בהובר */
+            color: #dc2626;  /* טקסט אדום בהובר */
+            border-color: #fecaca;
+            transform: translateY(-1px);
+        }
+
+        .reset-btn:active {
+            transform: translateY(0);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        th:last-child, td:last-child {
+            width: 100px;
+        }
+
+        /* עיצוב חדש לתאים עם שמות הדיירים */
+        #paymentsTable td:first-child {
+            font-family: 'David CLM', 'Frank Ruhl Libre', serif;  /* פונטים עבריים */
+            font-size: 1.1rem;  /* גודל פונט מעט גדול יותר */
+            font-weight: 500;   /* עובי בינוני */
+        }
+
+        /* עיצוב לאופציות בתיבת הבחירה */
+        #tenant option {
+            font-family: 'David CLM', 'Frank Ruhl Libre', serif;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Payment System - הישיבה דירה</h1>
+        
+        <div class="form-container">
+            <select id="tenant" required>
+                <option value="">Select Tenant</option>
+                <option value="ישראל שמעון בערנשטיין">ישראל שמעון בערנשטיין</option>
+                <option value="יצחק שטערן">יצחק שטערן</option>
+                <option value="דוד הערשקאוויטש">דוד הערשקאוויטש</option>
+                <option value="יחזקאל בער ווייזער">יחזקאל בער ווייזער</option>
+                <option value="עמרם ברייער">עמרם ברייער</option>
+                <option value="ישי וואסילסקי">ישי וואסילסקי</option>
+                <option value="משה לורינץ">משה לורינץ</option>
+                <option value="שמחה לייפער">שמחה לייפער</option>
+                <option value="אלתר ראבינאוויטש">אלתר ראבינאוויטש</option>
+                <option value="פריעדמאן">פריעדמאן</option>
+                <option value="שווארץ">שווארץ</option>
+            </select>
+            <input type="number" 
+                   id="amount" 
+                   placeholder="Payment Amount" 
+                   required 
+                   max="1350"
+                   oninput="validateAmount(this)">
+            <button onclick="addPayment()">Add Payment</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tenant Name</th>
+                    <th>Status</th>
+                    <th>Last Payment Date</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="paymentsTable">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="credit">
+        Built by <a href="#">Sruly Berenstein Technology Solutions</a>
+    </div>
+
+    <script>
+        const FULL_RENT = 1350; // הגדרת שכר דירה מלא
+
+        // אתחול התשלומים
+        let payments = JSON.parse(localStorage.getItem('payments')) || {};
+
+        // פונקציה חדשה לוולידציה של הסכום
+        function validateAmount(input) {
+            if (input.value > 1350) {
+                input.value = 1350;
+                alert('Maximum payment amount is ₪1,350');
+            }
+        }
+
+        function addPayment() {
+            const tenant = document.getElementById('tenant').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            if (!tenant) {
+                alert('Please select a tenant');
+                return;
+            }
+            if (!amount || isNaN(amount) || amount <= 0 || amount > 1350) {  // הוספת בדיקה נוספת
+                alert('Please enter a valid amount (up to ₪1,350)');
+                return;
+            }
+
+            if (!payments[tenant]) {
+                payments[tenant] = [];
+            }
+
+            const date = new Date();
+            const formattedDate = date.toLocaleDateString('en-US', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+            });
+
+            const payment = {
+                amount: amount,
+                date: formattedDate,
+                status: amount >= FULL_RENT ? 'Paid' : `Debt: ₪${FULL_RENT - amount}`
+            };
+
+            payments[tenant].push(payment);
+            localStorage.setItem('payments', JSON.stringify(payments));
+
+            document.getElementById('amount').value = '';
+            updatePaymentTable();
+            alert('Payment added successfully');
+        }
+
+        function resetPayment(tenant) {
+            if (confirm(`Are you sure you want to reset the payment status for ${tenant}?`)) {
+                payments[tenant] = [];
+                localStorage.setItem('payments', JSON.stringify(payments));
+                updatePaymentTable();
+                alert('Payment status has been reset successfully');
+            }
+        }
+
+        function updatePaymentTable() {
+            const tableBody = document.getElementById('paymentsTable');
+            tableBody.innerHTML = '';
+
+            // קבלת כל הדיירים מה-select
+            const tenantSelect = document.getElementById('tenant');
+            const allTenants = Array.from(tenantSelect.options)
+                .map(option => option.value)
+                .filter(value => value !== '');
+
+            allTenants.forEach(tenant => {
+                const row = document.createElement('tr');
+                
+                // שם הדייר
+                const nameCell = document.createElement('td');
+                nameCell.textContent = tenant;
+                row.appendChild(nameCell);
+
+                const tenantPayments = payments[tenant] || [];
+                const latestPayment = tenantPayments[tenantPayments.length - 1];
+
+                // סטטוס
+                const statusCell = document.createElement('td');
+                if (latestPayment) {
+                    if (latestPayment.amount >= FULL_RENT) {
+                        statusCell.textContent = 'Paid';
+                        statusCell.className = 'paid';
+                    } else {
+                        statusCell.textContent = `Debt: ₪${FULL_RENT - latestPayment.amount}`;
+                        statusCell.className = 'unpaid';
+                    }
+                } else {
+                    statusCell.textContent = 'Unpaid';
+                    statusCell.className = 'unpaid';
+                }
+                row.appendChild(statusCell);
+
+                // תאריך
+                const dateCell = document.createElement('td');
+                dateCell.textContent = latestPayment ? latestPayment.date : '-';
+                row.appendChild(dateCell);
+
+                // סכום
+                const amountCell = document.createElement('td');
+                amountCell.textContent = latestPayment ? `₪${latestPayment.amount}` : '-';
+                row.appendChild(amountCell);
+
+                // כפתור איפוס
+                const actionCell = document.createElement('td');
+                const resetButton = document.createElement('button');
+                resetButton.textContent = 'Reset';
+                resetButton.className = 'reset-btn';
+                resetButton.onclick = () => resetPayment(tenant);
+                actionCell.appendChild(resetButton);
+                row.appendChild(actionCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // טעינה ראשונית של הטבלה
+        document.addEventListener('DOMContentLoaded', updatePaymentTable);
+    </script>
+</body>
+</html>
